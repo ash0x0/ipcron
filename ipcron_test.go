@@ -91,8 +91,6 @@ func TestScheduleIteratorJob(t *testing.T) {
 func TestScheduleJobWithCronSyntax(t *testing.T) {
 	schedule := createTestSchedule()
 
-	// Every minute
-	minuteJob, _ := schedule.ScheduleWithCronSyntax("* * * * *", simpleJob, "minuteJob")
 	// Every second
 	secondsJob, _ := schedule.ScheduleWithCronSyntax("* * * * * * *", simpleJob, "secondJob")
 
@@ -103,12 +101,5 @@ func TestScheduleJobWithCronSyntax(t *testing.T) {
 	got := secondsJob.execCount
 	if got < 9 {
 		t.Errorf("Seconds job executed %v times after 10 seconds, should be > 9", got)
-	}
-
-	time.Sleep((60 - 10) * time.Second)
-
-	got = minuteJob.execCount
-	if got < 1 {
-		t.Errorf("Minutes job executed %v times after 1 minutes, should be > 1", got)
 	}
 }

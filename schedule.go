@@ -21,6 +21,8 @@ func (s *Schedule) startJob(j *Job) {
 		// This is because I'm yet unsure of Go's short circuit behavior
 		if j.execLimit != 0 {
 			if j.execCount >= j.execLimit {
+				j.stopped = true
+				s.jobWaitGroup.Done()
 				return
 			}
 		}
