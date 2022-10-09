@@ -19,11 +19,10 @@ func main() {
 
 	// Can create a new job by setting a time interval between each occurance
 	// Receives intervals as time.Duration
-	interval, _ := time.ParseDuration("10s")
-	intervalJob, _ := schedule.ScheduleJobWithInterval(interval, tenSeconds, "intervalExample")
+	intervalJob, _ := schedule.ScheduleJobWithInterval("10s", "20s", tenSeconds, "intervalExample")
 
 	// Can also use Cron Expression syntax to schedule the job at a certain time occurance
-	expressionJob, _ := schedule.ScheduleWithCronSyntax("* * * * * * *", everySecond, "cronExpressionExample")
+	expressionJob, _ := schedule.ScheduleWithCronSyntax("* * * * * * *", "20s", everySecond, "cronExpressionExample")
 
 	// Can set the maximumum number of occurances for the job, for both cron syntax and interval jobs
 	intervalJob.SetExecutionLimit(2)

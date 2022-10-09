@@ -2,16 +2,13 @@ package ipcron
 
 import (
 	"testing"
-	"time"
 )
 
 func TestAddJobToSchedule(t *testing.T) {
-	interval, _ := time.ParseDuration("1s")
-
 	schedule := createTestSchedule()
 
-	firstJob, _ := schedule.ScheduleJobWithInterval(interval, simpleJob, "firstJob")
-	secondJob, _ := schedule.ScheduleJobWithInterval(interval, simpleJob, "secondJob")
+	firstJob, _ := schedule.ScheduleJobWithInterval("1s", "1s", simpleJob, "firstJob")
+	secondJob, _ := schedule.ScheduleJobWithInterval("1s", "1s", simpleJob, "secondJob")
 
 	schedule.addJobToSchedule(firstJob)
 	schedule.addJobToSchedule(secondJob)
@@ -28,13 +25,10 @@ func TestAddJobToSchedule(t *testing.T) {
 }
 
 func TestSortSchedule(t *testing.T) {
-	earlyInterval, _ := time.ParseDuration("1s")
-	lateInterval, _ := time.ParseDuration("10s")
-
 	schedule := createTestSchedule()
 
-	earlyJob, _ := schedule.ScheduleJobWithInterval(earlyInterval, simpleJob, "simpleJob-early")
-	lateJob, _ := schedule.ScheduleJobWithInterval(lateInterval, simpleJob, "simpleJob-late")
+	earlyJob, _ := schedule.ScheduleJobWithInterval("1s", "1s", simpleJob, name+"-early")
+	lateJob, _ := schedule.ScheduleJobWithInterval("10s", "1s", simpleJob, name+"-late")
 
 	schedule.addJobToSchedule(earlyJob)
 	schedule.addJobToSchedule(lateJob)

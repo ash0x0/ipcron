@@ -6,7 +6,7 @@ import (
 )
 
 func TestCreateSimpleJob(t *testing.T) {
-	job, err := createTestSchedule().ScheduleJobWithInterval(interval, simpleJob, name)
+	job, err := createTestSchedule().ScheduleJobWithInterval("1s", "1s", simpleJob, name)
 
 	if err != nil {
 		t.Errorf("Job creation error %v", err)
@@ -18,8 +18,9 @@ func TestCreateSimpleJob(t *testing.T) {
 	if len(job.id) < 1 {
 		t.Errorf("Job is created without an ID")
 	}
-	if job.interval != interval {
-		t.Errorf("Job has incorrect interval. Expected %v, Got %v", interval, job.interval)
+	parsedInterval, _ := time.ParseDuration("1s")
+	if job.interval != parsedInterval {
+		t.Errorf("Job has incorrect interval. Expected %v, Got %v", parsedInterval, job.interval)
 	}
 	if job.execCount != 0 {
 		t.Errorf("Job starts with wrong exec count. Expected %v, Got %v", 0, job.execCount)
@@ -28,21 +29,22 @@ func TestCreateSimpleJob(t *testing.T) {
 
 func TestCreateCronExprJob(t *testing.T) {
 	cronExpression := "* * * * * * *"
-	job, err := createTestSchedule().ScheduleWithCronSyntax(cronExpression, simpleJob, name)
+	job, err := createTestSchedule().ScheduleWithCronSyntax(cronExpression, "1s", simpleJob, name)
 
 	if err != nil {
 		t.Errorf("Cron expression job creation error %v", err)
 	}
 
-	if job.interval != interval {
-		t.Errorf("Cron expression job has incorrect interval. Expected %v, Got %v", interval, job.interval)
+	parsedInterval, _ := time.ParseDuration("1s")
+	if job.interval != parsedInterval {
+		t.Errorf("Cron expression job has incorrect interval. Expected %v, Got %v", parsedInterval, job.interval)
 	}
 }
 
 func TestSetExecLimit(t *testing.T) {
 	execLimit := 5
 
-	job, _ := createTestSchedule().ScheduleJobWithInterval(interval, simpleJob, name)
+	job, _ := createTestSchedule().ScheduleJobWithInterval("1s", "1s", simpleJob, name)
 	job.SetExecutionLimit(execLimit)
 
 	if job.execLimit != execLimit {
@@ -51,7 +53,7 @@ func TestSetExecLimit(t *testing.T) {
 }
 
 func TestUpdateJob(t *testing.T) {
-	job, _ := createTestSchedule().ScheduleJobWithInterval(interval, simpleJob, name)
+	job, _ := createTestSchedule().ScheduleJobWithInterval("1s", "1s", simpleJob, name)
 
 	time.Sleep(2 * time.Second)
 

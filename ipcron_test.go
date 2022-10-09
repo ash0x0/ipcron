@@ -7,8 +7,6 @@ import (
 	"time"
 )
 
-var interval, _ = time.ParseDuration("1s")
-
 const name = "simpleJob"
 
 func simpleJob() {
@@ -28,9 +26,8 @@ func createTestSchedule() *Schedule {
 
 func TestScheduleSimpleJob(t *testing.T) {
 	schedule := createTestSchedule()
-	interval, _ := time.ParseDuration("1s")
 
-	job, _ := schedule.ScheduleJobWithInterval(interval, simpleJob, "simpleJob")
+	job, _ := schedule.ScheduleJobWithInterval("1s", "1s", simpleJob, name)
 	job.SetExecutionLimit(5 - 1)
 
 	schedule.Start()
@@ -47,11 +44,10 @@ func TestScheduleSimpleJob(t *testing.T) {
 
 func TestScheduleMany(t *testing.T) {
 	schedule := createTestSchedule()
-	interval, _ := time.ParseDuration("1s")
 	total := 100
 
 	for i := 0; i < total; i++ {
-		job, _ := schedule.ScheduleJobWithInterval(interval, simpleJob, "simpleJob-"+strconv.Itoa(i))
+		job, _ := schedule.ScheduleJobWithInterval("1s", "1s", simpleJob, name+"-"+strconv.Itoa(i))
 		job.SetExecutionLimit(5 - 1)
 	}
 
@@ -74,9 +70,8 @@ func TestScheduleMany(t *testing.T) {
 
 func TestScheduleIteratorJob(t *testing.T) {
 	schedule := createTestSchedule()
-	interval, _ := time.ParseDuration("1s")
 
-	job, _ := schedule.ScheduleJobWithInterval(interval, iteratorJob, "iteratorJob")
+	job, _ := schedule.ScheduleJobWithInterval("1s", "1s", iteratorJob, "iteratorJob")
 	job.SetExecutionLimit(5 - 1)
 
 	schedule.Start()
@@ -92,7 +87,7 @@ func TestScheduleJobWithCronSyntax(t *testing.T) {
 	schedule := createTestSchedule()
 
 	// Every second
-	secondsJob, _ := schedule.ScheduleWithCronSyntax("* * * * * * *", simpleJob, "secondJob")
+	secondsJob, _ := schedule.ScheduleWithCronSyntax("* * * * * * *", "1s", simpleJob, name)
 
 	schedule.Start()
 

@@ -43,21 +43,20 @@ You have two options to add this to the scheduler.
 
 ## Add With Interval
 ```Go
-interval := time.ParseDuration('10s')
-job, err := schedule.ScheduleJobWithInterval(interval, example, "exampleJob")
+job, err := schedule.ScheduleJobWithInterval("10s", "20s", example, "example")
 ```
 
-As you can see, this takes in a `time.Duration` type as the interval. The signature for this is as follows:
+This takes in a duration-compliant string that can be parsed by `time.ParseDuration` as the job interval. Same for the maximum job run time. The signature for this is as follows:
 
 ```Go
-func (s *Schedule) ScheduleJobWithInterval(timeInterval time.Duration, job func(), jobName string) (*Job, error)
+func (s *Schedule) ScheduleJobWithInterval(timeInterval string, maxRunTime string, job func(), jobName string) (*Job, error)
 ```
 
 It will add the function such that there is duration `timeInterval` between the end of every execution and the beginning of the next. This is a bit more intuitive option than the usual cron "at this moment in time".
 
 ## Add With Cron Syntax
 ```Go
-job, _ := schedule.ScheduleWithCronSyntax("* * * * * * *", example, "cronExample")
+job, err := schedule.ScheduleWithCronSyntax("* * * * * * *", "20s", example, "example")
 ```
 
 This allows adding with cron expression syntax, which is useful for generated and structured schedules, though definitely not as 
@@ -65,7 +64,7 @@ intuitive.
 
 The signature for this is:
 ```Go
-func (s *Schedule) ScheduleWithCronSyntax(scheduleExpression string, job func(), jobName string) (*Job, error)
+func (s *Schedule) ScheduleWithCronSyntax(scheduleExpression string, maxRunTime string, job func(), jobName string) (*Job, error)
 ```
 
 When adding with cron syntax, the scheduling behavior follows the same expected cron behavior. Instead of scheduling jobs at difinite intervals, it executes the job at preset moments in time.
@@ -96,7 +95,7 @@ scheduler.Stop()
 
 - Go was chosen because an "in-process cron scheduler" just sounds like something Go would be good at because concurrency. Also, I just wanted to learn some more Go.
 
-- Cron scheduling syntax is made available through `supercronic/cronexpr/` package. I don't see it as a core function of scheduling, which is why I didn't implement it myself. Though cron syntax is useful for computer generated schedules and copy-paste, it's quite anti-intuitive. Creating a parser for it is also relatively straight-forward and trivial so I personally didn't care to implement it myself.
+- Cron scheduling syntax is made available through `supercronic/cronexpr` package. I don't see it as a core function of scheduling, which is why I didn't implement it myself. Though cron syntax is useful for computer generated schedules and copy-paste, it's quite anti-intuitive. Creating a parser for it is also relatively straight-forward and trivial so I personally didn't care to implement it myself.
 
 - **Jobs don't persist past process** - Obviously, given this is "in-process", it ends with the process. Although making it persist past the process would be relatively easy, it just breaks away from the concept so no attempt was ever made to create that.
 
@@ -107,3 +106,10 @@ scheduler.Stop()
 # Limitations
 
 - **Limited function signatrue** - This accepts functions with no input and output. `func(number int) string` will give you an error. Though an implementation with Go channels can make this possible, this is not the one opted for here. Therefore you can only execute basic functions with this implementation.
+
+# TO-DO
+
+1. Use `time.AfterTime` to make jobs wait to execute instead of `time.Sleep` implementation. It's much simpler and better and will allow stopping the job with Timer as well.
+2. Stopping individual jobs, while running as well.
+3. Removing jobs from queue.
+.... A bunch more stuff I can't think of at the moment but would show up if have the time to continue on this
