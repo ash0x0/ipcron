@@ -6,7 +6,13 @@ If you find yourself here and haven't been given a link, this is not the cron dr
 
 # Getting Started
 
-### tl;dr
+## tl;dr
+In terminal:
+```bash
+go get github.com/ash0x0/ipcron
+```
+
+In your code:
 ```GO
 schedule := ipcron.NewSchedule(true)    // get new scheduler process
 job, err := schedule.ScheduleJobWithInterval(time.ParseDuration('10s'), example, "exampleJob")  // add a job with a simple time interval
@@ -14,6 +20,7 @@ job, _ := schedule.ScheduleWithCronSyntax("* * * * * * *", example, "cronExample
 schedule.Start()    // start all added jobs, nothing will happen without this
 schedule.Stop() // stop all jobs
 ```
+---
 
 There's a ready example in the `example` folder, check it out to see the gist of how this is supposed to be used.
 
