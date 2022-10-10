@@ -1,6 +1,6 @@
 # IPcron: In-Process Cron for Go
 
-A simpel and no-frills task scheduler for Go. Part interview task, part Go learning project, and a totally fun and nice experience for myself. Somewhat useless for everyone else ¯\_(ツ)_/¯. 
+A simple and no-frills task scheduler for Go. Part interview task, part Go learning project, and a totally fun and nice experience for myself. Somewhat useless for everyone else ¯\_(ツ)_/¯. 
 
 If you find yourself here and haven't been given a link, this is not the cron droid you're looking for.
 
@@ -46,20 +46,20 @@ You have two options to add this to the scheduler.
 job, err := schedule.ScheduleJobWithInterval("10s", "20s", example, "example")
 ```
 
-This takes in a duration-compliant string that can be parsed by `time.ParseDuration` as the job interval. Same for the maximum job run time. The signature for this is as follows:
+This takes in a duration-compliant string that can be parsed by `time.ParseDuration` for the job interval. Same for the maximum job run time. The signature for this is as follows:
 
 ```Go
 func (s *Schedule) ScheduleJobWithInterval(timeInterval string, maxRunTime string, job func(), jobName string) (*Job, error)
 ```
 
-It will add the function such that there is duration `timeInterval` between the end of every execution and the beginning of the next. This is a bit more intuitive option than the usual cron "at this moment in time".
+It will add the function such that there is a duration `timeInterval` between the end of every execution and the beginning of the next. This is a bit more intuitive option than the usual cron "at this moment in time".
 
 ## Add With Cron Syntax
 ```Go
 job, err := schedule.ScheduleWithCronSyntax("* * * * * * *", "20s", example, "example")
 ```
 
-This allows adding with cron expression syntax, which is useful for generated and structured schedules, though definitely not as 
+This allows adding jobs with cron expression syntax, which is useful for generated and structured schedules, though not as 
 intuitive.
 
 The signature for this is:
@@ -67,7 +67,7 @@ The signature for this is:
 func (s *Schedule) ScheduleWithCronSyntax(scheduleExpression string, maxRunTime string, job func(), jobName string) (*Job, error)
 ```
 
-When adding with cron syntax, the scheduling behavior follows the same expected cron behavior. Instead of scheduling jobs at difinite intervals, it executes the job at preset moments in time.
+When adding with cron syntax, the scheduling behavior follows the same expected cron behavior. Instead of scheduling jobs at definite intervals, it executes the job at preset moments in time.
 
 Whereas running with interval would say ***"execute this every 10 seconds"***, cron would say ***"execute this at multiples of 10 seconds on the clock"**
 
@@ -77,7 +77,7 @@ Any jobs you create will run forever, which is a very long time. To make things 
 ```Go
 job.SetExecutionLimit(10)
 ```
-This needs to be run before starting the scheduler. I have no idea what will happen if it's set during the schedule run (it'll likely not do anything) and it's not supported.
+This needs to be run before starting the scheduler. I have no idea what will happen if it's set during the run (it'll likely not do anything) and it's not supported.
 
 ## Start Schedule
 After you add all your processes, you need to start the scheduler. No jobs will run without this.
@@ -95,21 +95,22 @@ scheduler.Stop()
 
 - Go was chosen because an "in-process cron scheduler" just sounds like something Go would be good at because concurrency. Also, I just wanted to learn some more Go.
 
-- Cron scheduling syntax is made available through `supercronic/cronexpr` package. I don't see it as a core function of scheduling, which is why I didn't implement it myself. Though cron syntax is useful for computer generated schedules and copy-paste, it's quite anti-intuitive. Creating a parser for it is also relatively straight-forward and trivial so I personally didn't care to implement it myself.
+- Cron scheduling syntax is made available through `supercronic/cronexpr` package. I don't see it as a core function of scheduling, which is why I didn't implement it myself. Though cron syntax is useful for computer-generated schedules and copy-paste, it's quite anti-intuitive. Creating a parser for it is also relatively straightforward and trivial so I didn't care to implement it myself.
 
 - **Jobs don't persist past process** - Obviously, given this is "in-process", it ends with the process. Although making it persist past the process would be relatively easy, it just breaks away from the concept so no attempt was ever made to create that.
 
-- **Every job has a goroutine** - When the scheduler is started, each scheduled jobs gets its own goroutine where it lives for the remainder of the process. The job goroutines sleep when a job is waiting for the time to be run. The job goroutine should ideally execute and end when the job is due, not stick around sleeping. The reason for this choice is to make usage more predictable and the implementation simpler. It places control with the job goroutines and makes it so the scheduler goroutine doesn't have to act as a giant orchestrator, which would complicate its implementation.
+- **Every job has a goroutine** - When the scheduler is started, each scheduled job gets its goroutine where it lives for the remainder of the process. The job goroutines sleep when a job is waiting for the time to be run. The job goroutine should ideally execute and end when the job is due, not stick around sleeping. The reason for this choice is to make usage more predictable and the implementation simpler. It places control with the job goroutines and makes it so the scheduler goroutine doesn't have to act as a giant orchestrator, which would complicate its implementation.
 
-- **Job Hash ID** - Jobs have an MD5 hash ID. I wanted jobs to have a unique identified because I was looking to implement a per-job `Stop()` with the ID, which ended up not making it in :(. Why not an integer? Because hashes are guaranteed to be unique while integer IDs are really up to the implementation, and I didn't wanna have to worry about making them unique.
+- **Job Hash ID** - Jobs have an MD5 hash ID. I wanted jobs to have a unique identifier because I was looking to implement a per-job `Stop()` with the ID, which ended up not making it in :(. Why not an integer? Because hashes are guaranteed to be unique while integer IDs are really up to the implementation, and I didn't wanna have to worry about making them unique.
 
 # Limitations
 
-- **Limited function signatrue** - This accepts functions with no input and output. `func(number int) string` will give you an error. Though an implementation with Go channels can make this possible, this is not the one opted for here. Therefore you can only execute basic functions with this implementation.
+- **Limited function signature** - This accepts functions with no input and output. `func(number int) string` will give you an error. Though an implementation with Go channels can make this possible, this is not the one opted for here. Therefore you can only execute basic functions with this implementation.
 
 # TO-DO
 
 1. Use `time.AfterTime` to make jobs wait to execute instead of `time.Sleep` implementation. It's much simpler and better and will allow stopping the job with Timer as well.
 2. Stopping individual jobs, while running as well.
-3. Removing jobs from queue.
+3. Removing jobs from the queue.
+
 .... A bunch more stuff I can't think of at the moment but would show up if have the time to continue on this
